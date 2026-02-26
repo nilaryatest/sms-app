@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { LogOut, User, LayoutDashboard, Settings, BookOpen, GraduationCap, Users, CreditCard } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, Settings, BookOpen, GraduationCap, Users, CreditCard, CalendarRange, MessageSquare } from 'lucide-react';
 
 const SidebarLink = ({ to, icon: Icon, label, currentPath }) => {
     const isActive = currentPath.startsWith(to);
@@ -31,13 +31,26 @@ export default function Layout() {
 
     // Define links based on role
     let links = [];
-    if (role === 'ADMIN') {
+    if (role === 'SUPERADMIN') {
         links = [
-            { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            { to: '/admin/users', icon: Users, label: 'Users & Staff' },
-            { to: '/admin/academics', icon: BookOpen, label: 'Academics' },
-            { to: '/admin/id-cards', icon: CreditCard, label: 'ID Cards' },
-            { to: '/admin/settings', icon: Settings, label: 'Settings' },
+            { to: '/superadmin/dashboard', icon: LayoutDashboard, label: 'Command Center' },
+            { to: '/superadmin/users', icon: Users, label: 'Master Accounts' },
+            { to: '/superadmin/settings', icon: Settings, label: 'System Settings' },
+            { to: '/superadmin/profile', icon: User, label: 'My Profile' },
+        ];
+    } else if (role === 'ADMIN') {
+        links = [
+            { to: '/admin/dashboard', icon: LayoutDashboard, label: 'HQ Dashboard' },
+            { to: '/admin/academics', icon: BookOpen, label: 'Academics & Routine' },
+            { to: '/admin/users', icon: Users, label: 'Staff & Students' },
+            { to: '/admin/profile', icon: User, label: 'My Profile' },
+        ];
+    } else if (role === 'CLERK') {
+        links = [
+            { to: '/clerk/dashboard', icon: LayoutDashboard, label: 'Financial Office' },
+            { to: '/clerk/fees', icon: CreditCard, label: 'Fee Collection' },
+            { to: '/clerk/id-cards', icon: CreditCard, label: 'ID Cards' },
+            { to: '/clerk/profile', icon: User, label: 'My Profile' },
         ];
     } else if (role === 'TEACHER') {
         links = [
@@ -49,6 +62,8 @@ export default function Layout() {
         links = [
             { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { to: '/student/results', icon: GraduationCap, label: 'My Results' },
+            { to: '/student/leave', icon: CalendarRange, label: 'Leave Requests' },
+            { to: '/student/complaints', icon: MessageSquare, label: 'Helpdesk' },
             { to: '/student/profile', icon: User, label: 'Profile' },
         ];
     }

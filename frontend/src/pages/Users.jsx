@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { Plus, Users, Search, Loader2, Trash2, Mail, Phone, Shield, GraduationCap, Briefcase } from 'lucide-react';
+import useAuthStore from '../store/authStore';
+import { Plus, Users, Search, Loader2, Trash2, Mail, Phone, Shield, GraduationCap, Briefcase, CreditCard } from 'lucide-react';
 
 export default function UsersPage() {
+    const { role: currentUserRole } = useAuthStore();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL');
@@ -74,7 +76,7 @@ export default function UsersPage() {
 
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="flex gap-1 p-1 bg-gray-100 rounded-2xl w-full md:w-fit overflow-x-auto no-scrollbar">
-                    {['ALL', 'STUDENT', 'TEACHER', 'ADMIN'].map(tab => (
+                    {['ALL', 'STUDENT', 'TEACHER', 'ADMIN', ...(currentUserRole === 'SUPERADMIN' ? ['CLERK', 'SUPERADMIN'] : [])].map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -125,13 +127,17 @@ export default function UsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
-                                            <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center gap-2 w-fit ${user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700' :
-                                                    user.role === 'TEACHER' ? 'bg-emerald-50 text-emerald-700' :
-                                                        'bg-blue-50 text-blue-700'
+                                            <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center gap-2 w-fit ${user.role === 'SUPERADMIN' ? 'bg-red-50 text-red-700' :
+                                                    user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700' :
+                                                        user.role === 'TEACHER' ? 'bg-emerald-50 text-emerald-700' :
+                                                            user.role === 'CLERK' ? 'bg-amber-50 text-amber-700' :
+                                                                'bg-blue-50 text-blue-700'
                                                 }`}>
-                                                {user.role === 'ADMIN' ? <Shield className="w-3 h-3" /> :
-                                                    user.role === 'TEACHER' ? <Briefcase className="w-3 h-3" /> :
-                                                        <GraduationCap className="w-3 h-3" />}
+                                                {user.role === 'SUPERADMIN' ? <Shield className="w-3 h-3 text-red-500" /> :
+                                                    user.role === 'ADMIN' ? <Shield className="w-3 h-3" /> :
+                                                        user.role === 'TEACHER' ? <Briefcase className="w-3 h-3" /> :
+                                                            user.role === 'CLERK' ? <CreditCard className="w-3 h-3 text-amber-500" /> :
+                                                                <GraduationCap className="w-3 h-3" />}
                                                 {user.role}
                                             </span>
                                         </td>
@@ -233,6 +239,12 @@ export default function UsersPage() {
                                         <option value="STUDENT">Student</option>
                                         <option value="TEACHER">Teacher</option>
                                         <option value="ADMIN">Admin</option>
+                                        {currentUserRole === 'SUPERADMIN' && (
+                                            <>
+                                                <option value="CLERK">Clerk</option>
+                                                <option value="SUPERADMIN">Super Admin</option>
+                                            </>
+                                        )}
                                     </select>
                                 </div>
                             </div>

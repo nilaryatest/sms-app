@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 import useAuthStore from '../store/authStore';
-import { BookOpen, GraduationCap, TrendingUp, Award, Calendar, Loader2, User as UserIcon } from 'lucide-react';
+import { BookOpen, GraduationCap, TrendingUp, Award, Calendar, Loader2, User as UserIcon, Clock } from 'lucide-react';
 
 export default function StudentDashboard() {
     const { user } = useAuthStore();
     const [profile, setProfile] = useState(null);
     const [results, setResults] = useState([]);
+    const [routines, setRoutines] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,12 +17,14 @@ export default function StudentDashboard() {
     const fetchStudentData = async () => {
         setLoading(true);
         try {
-            const [profileRes, resultsRes] = await Promise.all([
+            const [profileRes, resultsRes, routinesRes] = await Promise.all([
                 api.get('/students/me'),
-                api.get('/results/me')
+                api.get('/results/me'),
+                api.get('/routine/')
             ]);
             setProfile(profileRes.data);
             setResults(resultsRes.data);
+            setRoutines(routinesRes.data);
         } catch (err) {
             console.error("Failed to fetch student data", err);
         } finally {
@@ -41,6 +44,11 @@ export default function StudentDashboard() {
     const averageScore = results.length > 0
         ? (results.reduce((acc, curr) => acc + curr.marks_obtained, 0) / results.length).toFixed(1)
         : 0;
+
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    const todaysClasses = routines
+        .filter(r => r.day_of_week === today)
+        .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -126,65 +134,112 @@ export default function StudentDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                {/* Results Table */}
+
+                {/* Master Timetable Widget */}
                 <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                    <div className="px-10 py-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
-                        <h3 className="text-xl font-black text-gray-900 tracking-tighter">Recent Results</h3>
-                        <BookOpen className="w-5 h-5 text-gray-400" />
+                    <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between">
+                        <div>
+                            <h3 className="text-xl font-black text-gray-900 tracking-tighter">My Schedule</h3>
+                            <p className="text-xs text-indigo-500 font-bold mt-1 uppercase tracking-widest">{today}</p>
+                        </div>
+                        <Calendar className="w-6 h-6 text-indigo-200" />
                     </div>
-                    {results.length === 0 ? (
-                        <div className="flex-1 flex flex-col items-center justify-center p-20 text-center text-gray-300">
-                            <h4 className="font-bold">No results published yet.</h4>
-                            <p className="text-sm">Check back after your mid-term exams!</p>
+                    {todaysClasses.length === 0 ? (
+                        <div className="flex-1 flex flex-col items-center justify-center p-16 text-center text-gray-400">
+                            <Clock className="w-12 h-12 text-gray-200 mb-4" />
+                            <h4 className="font-bold text-gray-500">No classes today.</h4>
+                            <p className="text-xs font-medium">Enjoy your free time or head to the library.</p>
                         </div>
                     ) : (
-                        <div className="p-4">
-                            <div className="space-y-2">
-                                {results.map((result) => (
-                                    <div key={result.id} className="flex items-center justify-between px-8 py-5 rounded-2xl hover:bg-indigo-50/20 transition-all">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-black text-xs">
-                                                {result.subject_id}
-                                            </div>
-                                            <div>
-                                                <p className="font-black text-gray-900 leading-none mb-1">{result.exam_name}</p>
-                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Score: {result.marks_obtained}/{result.total_marks}</p>
-                                            </div>
+                        <div className="flex-1 overflow-y-auto p-8 space-y-4">
+                            {todaysClasses.map((cls, idx) => (
+                                <div key={cls.id} className="group flex items-start gap-4 p-5 rounded-2xl bg-gray-50/50 hover:bg-white border border-transparent hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-50 transition-all">
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black shadow-inner border border-indigo-100/50">
+                                            {idx + 1}
                                         </div>
-                                        <div className={`px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${result.marks_obtained >= 80 ? 'bg-emerald-50 text-emerald-600' :
-                                                result.marks_obtained >= 60 ? 'bg-amber-50 text-amber-600' :
-                                                    'bg-rose-50 text-rose-600'
-                                            }`}>
-                                            {result.grade || (result.marks_obtained >= 80 ? 'EXCELLENT' : 'GOOD')}
+                                        {idx !== todaysClasses.length - 1 && (
+                                            <div className="w-0.5 h-6 bg-gray-100 my-1 group-hover:bg-indigo-100 transition-colors"></div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 pt-1">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-black text-gray-900 leading-none">{cls.subject?.name}</h4>
+                                            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md uppercase tracking-wider text-right">
+                                                {cls.start_time.substring(0, 5)}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-xs font-bold text-gray-500 mt-2">
+                                            <span className="flex items-center gap-1"><UserIcon className="w-3.5 h-3.5 opacity-50" /> Prof. {cls.teacher?.last_name || 'TBD'}</span>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
 
-                {/* Additional Hub Content */}
-                <div className="bg-gray-900 rounded-[2.5rem] shadow-2xl p-10 text-white flex flex-col justify-between relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <h3 className="text-3xl font-black tracking-tight leading-tight">EduManage <br /> Student Hub</h3>
-                        <p className="mt-4 text-gray-400 font-medium leading-relaxed">
-                            Access your timetable, library resources, and school announcements all in one place.
-                        </p>
-
-                        <div className="mt-10 grid grid-cols-2 gap-4">
-                            <div className="p-6 bg-white/5 rounded-[2rem] backdrop-blur-md border border-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                                <h5 className="font-black text-xs uppercase tracking-widest text-indigo-400">Library</h5>
-                                <p className="mt-2 font-bold text-sm">2 Overdue Books</p>
+                <div className="space-y-10">
+                    {/* Results Table */}
+                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <div className="px-10 py-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
+                            <h3 className="text-xl font-black text-gray-900 tracking-tighter">Recent Results</h3>
+                            <BookOpen className="w-5 h-5 text-gray-400" />
+                        </div>
+                        {results.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center text-gray-300">
+                                <h4 className="font-bold">No results published yet.</h4>
+                                <p className="text-sm">Check back after your mid-term exams!</p>
                             </div>
-                            <div className="p-6 bg-white/5 rounded-[2rem] backdrop-blur-md border border-white/5 hover:bg-white/10 transition-all cursor-pointer">
-                                <h5 className="font-black text-xs uppercase tracking-widest text-emerald-400">Notices</h5>
-                                <p className="mt-2 font-bold text-sm">4 New Updates</p>
+                        ) : (
+                            <div className="p-4">
+                                <div className="space-y-2">
+                                    {results.map((result) => (
+                                        <div key={result.id} className="flex items-center justify-between px-8 py-5 rounded-2xl hover:bg-indigo-50/20 transition-all">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-black text-xs">
+                                                    {result.subject_id}
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-gray-900 leading-none mb-1">{result.exam_name}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Score: {result.marks_obtained}/{result.total_marks}</p>
+                                                </div>
+                                            </div>
+                                            <div className={`px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${result.marks_obtained >= 80 ? 'bg-emerald-50 text-emerald-600' :
+                                                result.marks_obtained >= 60 ? 'bg-amber-50 text-amber-600' :
+                                                    'bg-rose-50 text-rose-600'
+                                                }`}>
+                                                {result.grade || (result.marks_obtained >= 80 ? 'EXCELLENT' : 'GOOD')}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Additional Hub Content */}
+                    <div className="bg-gray-900 rounded-[2.5rem] shadow-2xl p-10 text-white flex flex-col justify-between relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <h3 className="text-3xl font-black tracking-tight leading-tight">EduManage <br /> Student Hub</h3>
+                            <p className="mt-4 text-gray-400 font-medium leading-relaxed">
+                                Access your timetable, library resources, and school announcements all in one place.
+                            </p>
+
+                            <div className="mt-10 grid grid-cols-2 gap-4">
+                                <div className="p-6 bg-white/5 rounded-[2rem] backdrop-blur-md border border-white/5 hover:bg-white/10 transition-all cursor-pointer">
+                                    <h5 className="font-black text-xs uppercase tracking-widest text-indigo-400">Library</h5>
+                                    <p className="mt-2 font-bold text-sm">2 Overdue Books</p>
+                                </div>
+                                <div className="p-6 bg-white/5 rounded-[2rem] backdrop-blur-md border border-white/5 hover:bg-white/10 transition-all cursor-pointer">
+                                    <h5 className="font-black text-xs uppercase tracking-widest text-emerald-400">Notices</h5>
+                                    <p className="mt-2 font-bold text-sm">4 New Updates</p>
+                                </div>
                             </div>
                         </div>
+                        {/* Background blob */}
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-colors"></div>
                     </div>
-                    {/* Background blob */}
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-colors"></div>
                 </div>
             </div>
         </div>

@@ -11,8 +11,12 @@ from app.api.dependencies import get_current_active_user
 router = APIRouter()
 
 def check_admin(user: User):
-    if user.role != UserRole.ADMIN:
+    if user.role not in [UserRole.ADMIN, UserRole.SUPERADMIN]:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+
+def check_superadmin(user: User):
+    if user.role != UserRole.SUPERADMIN:
+        raise HTTPException(status_code=403, detail="Super Admin privileges required")
 
 @router.post("/", response_model=UserResponse)
 def create_user(
@@ -21,6 +25,10 @@ def create_user(
     current_user: User = Depends(get_current_active_user)
 ):
     check_admin(current_user)
+    
+    # Hierarchy check: Only SUPERADMIN can create another SUPERADMIN or ADMIN
+    if user_in.role in [UserRole.SUPERADMIN, UserRole.ADMIN] and current_user.role != UserRole.SUPERADMIN:
+        raise HTTPException(status_code=403, detail="You do not have permission to create Admin-level accounts.")
     
     user = db.query(User).filter(User.email == user_in.email).first()
     if user:

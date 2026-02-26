@@ -4,6 +4,10 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import StudentLeave from './pages/StudentLeave';
+import StudentComplaints from './pages/StudentComplaints';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import ClerkDashboard from './pages/ClerkDashboard';
 
 export const router = createBrowserRouter([
     {
@@ -13,6 +17,20 @@ export const router = createBrowserRouter([
     {
         path: '/',
         element: <Navigate to="/login" replace />,
+    },
+    {
+        path: '/superadmin',
+        element: <Layout />,
+        children: [
+            { path: 'dashboard', element: <SuperAdminDashboard /> },
+        ],
+    },
+    {
+        path: '/clerk',
+        element: <Layout />,
+        children: [
+            { path: 'dashboard', element: <ClerkDashboard /> },
+        ],
     },
     {
         path: '/admin',
@@ -33,6 +51,8 @@ export const router = createBrowserRouter([
         element: <Layout />,
         children: [
             { path: 'dashboard', element: <StudentDashboard /> },
+            { path: 'leave', element: <StudentLeave /> },
+            { path: 'complaints', element: <StudentComplaints /> },
         ],
     },
     {

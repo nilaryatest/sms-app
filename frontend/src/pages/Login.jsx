@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { GraduationCap, Mail, Lock, AlertCircle, Loader2, BookOpen, ShieldCheck, Sparkles } from 'lucide-react';
+import { GraduationCap, Mail, Lock, AlertCircle, Loader2, BookOpen, ShieldCheck, Sparkles, Shield, CreditCard } from 'lucide-react';
 
 const loginSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -38,6 +38,19 @@ const ROLE_THEMES = {
         subtext: 'Access student records & grading',
         blobColor: 'bg-indigo-200'
     },
+    CLERK: {
+        id: 'CLERK',
+        label: 'Clerk',
+        color: 'from-amber-500 to-orange-500',
+        textColor: 'text-amber-600',
+        ringColor: 'focus:ring-amber-500',
+        borderColor: 'focus:border-amber-500',
+        buttonBg: 'bg-amber-600 hover:bg-amber-700',
+        icon: CreditCard,
+        greeting: 'Financial Office',
+        subtext: 'Manage fees and ledgers',
+        blobColor: 'bg-amber-200'
+    },
     ADMIN: {
         id: 'ADMIN',
         label: 'Admin',
@@ -50,6 +63,19 @@ const ROLE_THEMES = {
         greeting: 'Command Center',
         subtext: 'Oversee school infrastructure',
         blobColor: 'bg-slate-300'
+    },
+    SUPERADMIN: {
+        id: 'SUPERADMIN',
+        label: 'Super Admin',
+        color: 'from-red-600 to-rose-600',
+        textColor: 'text-red-600',
+        ringColor: 'focus:ring-red-500',
+        borderColor: 'focus:border-red-500',
+        buttonBg: 'bg-red-600 hover:bg-red-700',
+        icon: Shield,
+        greeting: 'System Owner',
+        subtext: 'Total administrative control',
+        blobColor: 'bg-red-200'
     }
 };
 
@@ -71,7 +97,9 @@ export default function Login() {
         const success = await login(data.email, data.password);
         if (success) {
             const role = useAuthStore.getState().role;
-            if (role === 'ADMIN') navigate('/admin/dashboard');
+            if (role === 'SUPERADMIN') navigate('/superadmin/dashboard');
+            else if (role === 'CLERK') navigate('/clerk/dashboard');
+            else if (role === 'ADMIN') navigate('/admin/dashboard');
             else if (role === 'TEACHER') navigate('/teacher/dashboard');
             else if (role === 'STUDENT') navigate('/student/dashboard');
         }
@@ -104,13 +132,13 @@ export default function Login() {
                     </div>
 
                     {/* Role Switcher */}
-                    <div className="flex justify-center p-1.5 bg-white rounded-[2rem] shadow-sm border border-gray-100 w-fit mx-auto scale-95 md:scale-100">
+                    <div className="flex flex-wrap justify-center p-1.5 bg-white rounded-2xl md:rounded-[2rem] shadow-sm border border-gray-100 w-full max-w-[22rem] md:max-w-none md:w-fit mx-auto scale-95 md:scale-100 gap-1 md:gap-0">
                         {Object.values(ROLE_THEMES).map((r) => (
                             <button
                                 key={r.id}
                                 onClick={() => setSelectedRole(r.id)}
                                 className={`
-                                    px-6 py-2.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2
+                                    px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2
                                     ${selectedRole === r.id
                                         ? `bg-gray-900 text-white shadow-lg shadow-gray-200`
                                         : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'

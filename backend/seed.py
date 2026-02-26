@@ -7,13 +7,14 @@ def seed_db():
     db = SessionLocal()
     try:
         # Check if admin already exists
+        # Check if admin already exists
         admin = db.query(User).filter(User.email == "admin@school.com").first()
         if not admin:
-            print("Creating super admin...")
+            print("Creating admin...")
             admin = User(
                 email="admin@school.com",
                 hashed_password=get_password_hash("admin123"),
-                first_name="Super",
+                first_name="System",
                 last_name="Admin",
                 role=UserRole.ADMIN,
                 is_active=True
@@ -23,6 +24,36 @@ def seed_db():
             print("Super admin created successfully.")
         else:
             print("Admin user already exists.")
+            
+        superadmin = db.query(User).filter(User.email == "superadmin@school.com").first()
+        if not superadmin:
+            print("Creating super admin...")
+            superadmin = User(
+                email="superadmin@school.com",
+                hashed_password=get_password_hash("superadmin123"),
+                first_name="Super",
+                last_name="Admin",
+                role=UserRole.SUPERADMIN,
+                is_active=True
+            )
+            db.add(superadmin)
+            db.commit()
+            print("Super admin created successfully.")
+            
+        clerk = db.query(User).filter(User.email == "clerk@school.com").first()
+        if not clerk:
+            print("Creating clerk...")
+            clerk = User(
+                email="clerk@school.com",
+                hashed_password=get_password_hash("clerk123"),
+                first_name="Financial",
+                last_name="Clerk",
+                role=UserRole.CLERK,
+                is_active=True
+            )
+            db.add(clerk)
+            db.commit()
+            print("Clerk created successfully.")
             
         # Optional: Add a sample teacher and student
         teacher_email = "teacher@school.com"
