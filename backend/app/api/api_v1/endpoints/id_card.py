@@ -13,8 +13,8 @@ async def generate_id_card(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Only Admins can generate ID cards.")
+    if current_user.role not in [UserRole.ADMIN, UserRole.CLERK, UserRole.SUPERADMIN]:
+        raise HTTPException(status_code=403, detail="Only Admins or Clerks can generate ID cards.")
         
     student_profile = db.query(StudentProfile).filter(StudentProfile.id == student_id).first()
     if not student_profile:

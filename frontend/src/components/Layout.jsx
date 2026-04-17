@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
-import { LogOut, User, LayoutDashboard, Settings, BookOpen, GraduationCap, Users, CreditCard, CalendarRange, MessageSquare } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, Settings, BookOpen, GraduationCap, Users, CreditCard, CalendarRange, MessageSquare, Clock, FileText, ClipboardList, Receipt, TrendingUp, Award, CalendarPlus, BadgeCheck, ClipboardEdit, UserPlus, Bell, Image, CalendarClock, ClipboardCheck, BookCopy, Send, SearchCheck, Landmark, ShieldAlert, Signal } from 'lucide-react';
 
 const SidebarLink = ({ to, icon: Icon, label, currentPath }) => {
     const isActive = currentPath.startsWith(to);
@@ -34,7 +34,11 @@ export default function Layout() {
     if (role === 'SUPERADMIN') {
         links = [
             { to: '/superadmin/dashboard', icon: LayoutDashboard, label: 'Command Center' },
-            { to: '/superadmin/users', icon: Users, label: 'Master Accounts' },
+            { to: '/superadmin/users', icon: Users, label: 'User Directory Control' },
+            { to: '/superadmin/finances', icon: Landmark, label: 'Fees & Financials' },
+            { to: '/superadmin/academics', icon: BookOpen, label: 'Academic Control' },
+            { to: '/superadmin/exams', icon: ShieldAlert, label: 'Exam Master Control' },
+            { to: '/superadmin/communications', icon: Signal, label: 'Communication Hub' },
             { to: '/superadmin/settings', icon: Settings, label: 'System Settings' },
             { to: '/superadmin/profile', icon: User, label: 'My Profile' },
         ];
@@ -43,28 +47,51 @@ export default function Layout() {
             { to: '/admin/dashboard', icon: LayoutDashboard, label: 'HQ Dashboard' },
             { to: '/admin/academics', icon: BookOpen, label: 'Academics & Routine' },
             { to: '/admin/users', icon: Users, label: 'Staff & Students' },
+            { to: '/admin/routine', icon: CalendarPlus, label: 'Class Routine Generation' },
+            { to: '/admin/exam-routine', icon: CalendarClock, label: 'Exam Routine' },
+            { to: '/admin/duty-chart', icon: ClipboardCheck, label: 'Duty Chart' },
+            { to: '/admin/copy-allocation', icon: BookCopy, label: 'Exam Copy Allocation' },
+            { to: '/admin/script-distribution', icon: Send, label: 'Answer Script Distribution' },
+            { to: '/admin/marks-inspection', icon: SearchCheck, label: 'Marks Entry Inspection' },
+            { to: '/admin/push-notification', icon: Bell, label: 'Push Notification' },
+            { to: '/admin/push-gallery', icon: Image, label: 'Push Gallery Photo' },
             { to: '/admin/profile', icon: User, label: 'My Profile' },
         ];
     } else if (role === 'CLERK') {
         links = [
-            { to: '/clerk/dashboard', icon: LayoutDashboard, label: 'Financial Office' },
-            { to: '/clerk/fees', icon: CreditCard, label: 'Fee Collection' },
-            { to: '/clerk/id-cards', icon: CreditCard, label: 'ID Cards' },
-            { to: '/clerk/profile', icon: User, label: 'My Profile' },
+            { to: '/clerk/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            { to: '/clerk/profile', icon: User, label: 'Profile Edit' },
+            { to: '/clerk/admission', icon: UserPlus, label: 'Admission to New Class' },
+            { to: '/clerk/id-cards', icon: BadgeCheck, label: 'ID Card Generation' },
+            { to: '/clerk/certificates', icon: Award, label: 'Character Certificate Generation' },
+            { to: '/clerk/fees', icon: Receipt, label: 'Fees Collection Receipt' },
+            { to: '/clerk/ledger', icon: TrendingUp, label: 'Income Expenditure' },
+            { to: '/clerk/push-notification', icon: Bell, label: 'Push Notification' },
+            { to: '/clerk/push-gallery', icon: Image, label: 'Push Gallery Photo' },
+            { to: '/clerk/leave', icon: CalendarRange, label: 'Leave Request' },
+            { to: '/clerk/feedback', icon: MessageSquare, label: 'Feedback' },
         ];
     } else if (role === 'TEACHER') {
         links = [
-            { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'My Classes' },
-            { to: '/teacher/results', icon: BookOpen, label: 'Upload Results' },
-            { to: '/teacher/profile', icon: User, label: 'Profile' },
+            { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+            { to: '/teacher/profile', icon: User, label: 'Profile Edit' },
+            { to: '/teacher/routine', icon: Clock, label: 'Show Routine' },
+            { to: '/teacher/classes', icon: Users, label: 'Class Management' },
+            { to: '/teacher/marks', icon: ClipboardList, label: 'Marks Entry' },
+            { to: '/teacher/marksheet', icon: FileText, label: 'Marksheet Generation' },
+            { to: '/teacher/leave', icon: CalendarRange, label: 'Leave Request' },
+            { to: '/teacher/feedback', icon: MessageSquare, label: 'Feedback' },
         ];
     } else if (role === 'STUDENT') {
         links = [
             { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            { to: '/student/results', icon: GraduationCap, label: 'My Results' },
-            { to: '/student/leave', icon: CalendarRange, label: 'Leave Requests' },
-            { to: '/student/complaints', icon: MessageSquare, label: 'Helpdesk' },
-            { to: '/student/profile', icon: User, label: 'Profile' },
+            { to: '/student/registration', icon: ClipboardEdit, label: 'Registration' },
+            { to: '/student/profile', icon: User, label: 'Profile Edit' },
+            { to: '/student/routine', icon: Clock, label: 'Show Routine' },
+            { to: '/student/results', icon: GraduationCap, label: 'Show Result' },
+            { to: '/student/leave', icon: CalendarRange, label: 'Leave Request' },
+            { to: '/student/fees', icon: CreditCard, label: 'Fees Amount' },
+            { to: '/student/complaints', icon: MessageSquare, label: 'Feedback' },
         ];
     }
 

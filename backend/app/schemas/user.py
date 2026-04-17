@@ -15,6 +15,14 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+# New Student Registration schema
+class StudentRegister(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: str
+    last_name: str
+    phone_number: Optional[str] = None
+
 # Properties to receive via API on update
 class UserUpdate(BaseModel):
     first_name: Optional[str] = None

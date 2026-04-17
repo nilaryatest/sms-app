@@ -13,8 +13,8 @@ router = APIRouter()
 # --- Leave Requests ---
 @router.post("/leaves", response_model=LeaveRequestResponse)
 def create_leave_request(leave_in: LeaveRequestCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    if current_user.role != UserRole.STUDENT:
-        raise HTTPException(status_code=403, detail="Only students can request leaves here.")
+    if current_user.role not in [UserRole.STUDENT, UserRole.TEACHER, UserRole.CLERK]:
+        raise HTTPException(status_code=403, detail="Only students, teachers, and clerks can request leaves here.")
     
     leave = LeaveRequest(**leave_in.dict(), student_id=current_user.id)
     db.add(leave)
@@ -24,8 +24,8 @@ def create_leave_request(leave_in: LeaveRequestCreate, db: Session = Depends(get
 
 @router.get("/leaves/me", response_model=List[LeaveRequestResponse])
 def get_my_leaves(db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    if current_user.role != UserRole.STUDENT:
-        raise HTTPException(status_code=403, detail="Only students can view their own leaves here.")
+    if current_user.role not in [UserRole.STUDENT, UserRole.TEACHER, UserRole.CLERK]:
+        raise HTTPException(status_code=403, detail="Only students, teachers, and clerks can view their own leaves here.")
     return db.query(LeaveRequest).filter(LeaveRequest.student_id == current_user.id).order_by(LeaveRequest.created_at.desc()).all()
 
 @router.get("/leaves", response_model=List[LeaveRequestResponse])

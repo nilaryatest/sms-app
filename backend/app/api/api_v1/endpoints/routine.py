@@ -11,8 +11,8 @@ from app.schemas.routine import TimetableCreate, TimetableUpdate, TimetableRespo
 router = APIRouter()
 
 def check_admin(user: User):
-    if user.role not in [UserRole.ADMIN, UserRole.SUPERADMIN]:
-        raise HTTPException(status_code=403, detail="Admin privileges required")
+    if user.role not in [UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.CLERK]:
+        raise HTTPException(status_code=403, detail="Admin or Clerk privileges required")
 
 # --- Timetables (Routines) ---
 @router.post("/", response_model=TimetableResponse)

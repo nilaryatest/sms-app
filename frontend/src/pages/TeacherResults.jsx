@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { BookOpen, GraduationCap, Plus, Loader2, Save, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
+import { BookOpen, GraduationCap, Plus, Loader2, Save, FileSpreadsheet, CheckCircle2, Layers } from 'lucide-react';
 
 export default function Results() {
     const [sections, setSections] = useState([]);

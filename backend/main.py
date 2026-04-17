@@ -9,10 +9,16 @@ load_dotenv()
 
 app = FastAPI(title="School Management System API", version="1.0.0")
 
+# Build CORS origins list from environment
+allowed_origins = ["http://localhost:5173"]
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 # CORS config allowing frontend to fetch
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
