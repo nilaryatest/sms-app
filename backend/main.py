@@ -10,7 +10,7 @@ load_dotenv()
 app = FastAPI(title="School Management System API", version="1.0.0")
 
 # Build CORS origins list from environment
-allowed_origins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+allowed_origins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://sms-app-red.vercel.app"]
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
     # Remove any trailing slashes and spaces which would break CORS exact matching
