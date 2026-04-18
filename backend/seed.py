@@ -86,60 +86,6 @@ def seed_db():
             db.add(student)
             db.commit()
             
-        # --- Add Basic Academic Data & Profiles ---
-        from app.models.academic import ClassRoom, Section
-        from app.models.profiles import TeacherProfile, StudentProfile
-        from datetime import datetime
-
-        # Ensure at least one Class and Section exists
-        classroom = db.query(ClassRoom).filter(ClassRoom.name == "Class 10").first()
-        if not classroom:
-            classroom = ClassRoom(name="Class 10")
-            db.add(classroom)
-            db.commit()
-            db.refresh(classroom)
-
-        section = db.query(Section).filter(Section.name == "A").first()
-        if not section:
-            section = Section(name="A", class_id=classroom.id)
-            db.add(section)
-            db.commit()
-            db.refresh(section)
-
-        # Create Teacher Profile
-        teacher_profile = db.query(TeacherProfile).filter(TeacherProfile.user_id == teacher.id).first()
-        if not teacher_profile:
-            teacher_profile = TeacherProfile(
-                user_id=teacher.id,
-                employee_id="T001",
-                designation="Senior Math Teacher",
-                department="Mathematics",
-                joining_date=datetime.now().date(),
-                contact_number="555-0011",
-                address="123 Teacher Lane"
-            )
-            db.add(teacher_profile)
-            db.commit()
-
-        # Create Student Profile
-        student_profile = db.query(StudentProfile).filter(StudentProfile.user_id == student.id).first()
-        if not student_profile:
-            student_profile = StudentProfile(
-                user_id=student.id,
-                admission_number="ADM-2026-01",
-                roll_number="10",
-                class_id=classroom.id,
-                section_id=section.id,
-                date_of_birth=datetime(2010, 5, 15).date(),
-                gender="Female",
-                blood_group="O+",
-                guardian_name="Mr. Smith",
-                guardian_contact="555-0099",
-                address="456 Student Blvd"
-            )
-            db.add(student_profile)
-            db.commit()
-            
     finally:
         db.close()
 
