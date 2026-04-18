@@ -9,13 +9,21 @@ load_dotenv()
 
 app = FastAPI(title="School Management System API", version="1.0.0")
 
-# Build CORS origins list from environment
-allowed_origins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://sms-app-red.vercel.app"]
+# Build CORS origins list from environment. 
+# Update these domains if you move to a custom domain.
+allowed_origins = [
+    "https://sms-app-red.vercel.app",
+    "https://school-website-sigma-one.vercel.app"
+]
+
+# You can also add custom domains dynamically using the FRONTEND_URL environment variable
+# on your Render dashboard (comma separated for multiple)
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
-    # Remove any trailing slashes and spaces which would break CORS exact matching
-    clean_url = frontend_url.strip().rstrip("/")
-    allowed_origins.append(clean_url)
+    for url in frontend_url.split(","):
+        clean_url = url.strip().rstrip("/")
+        if clean_url and clean_url not in allowed_origins:
+            allowed_origins.append(clean_url)
 
 # CORS config allowing frontend to fetch
 app.add_middleware(
