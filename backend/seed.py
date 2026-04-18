@@ -94,7 +94,7 @@ def seed_db():
         # Ensure at least one Class and Section exists
         classroom = db.query(ClassRoom).filter(ClassRoom.name == "Class 10").first()
         if not classroom:
-            classroom = ClassRoom(name="Class 10", grade_level=10)
+            classroom = ClassRoom(name="Class 10")
             db.add(classroom)
             db.commit()
             db.refresh(classroom)
